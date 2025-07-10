@@ -158,8 +158,4 @@ colSums(mat,na.rm = TRUE)
 rowMeans(mat,na.rm = TRUE)
 colMeans(mat,na.rm = TRUE)
 
-# Matrices
-A <- matrix(1:15,5,3)
-A
-
 # FIN
