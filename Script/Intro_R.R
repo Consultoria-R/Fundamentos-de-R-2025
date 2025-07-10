@@ -158,5 +158,6 @@ colSums(mat,na.rm = TRUE)
 rowMeans(mat,na.rm = TRUE)
 colMeans(mat,na.rm = TRUE)
 
-# FIN
 2+2
+3*8+6*8
+# FIN
