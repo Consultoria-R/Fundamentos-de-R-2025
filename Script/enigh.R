@@ -560,9 +560,3 @@ svytable(~sexo_jefe + est_socio, design = enigh_2020_svy)
 svychisq(~sexo_jefe + est_socio, design = enigh_2020_svy)
 
 # FIN
-
-(s2.ing <- var(master$ing_cor))
-(N <- length(master$ing_cor))
-(n2 <- qnorm(0.975)^2 * N^2 * s2.ing / 10000000^2)
-(nn2 <- n2/(1+n2/N))
-(nn2/N)
