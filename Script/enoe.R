@@ -11,47 +11,55 @@ setwd("~/Curso_R_2025/ENOE")
 # Cargar base de datos
 sdem_1t25 <- 
   read_dta("enoe_2025_trim1_dta/ENOE_SDEMT125.dta")
-sdem_1t25
+sdem_1t25 # con_basedatos_proy2010 pág 8; 423,302 registros
 
-# Filtrar base de datos de acuerdo a la metodología del INEGI
+# Filtrar base de datos de acuerdo a la metodología del ENOE: pág 14
 sdem_1t25 <- 
   sdem_1t25 %>% 
   filter(r_def==0 & (c_res==1 | c_res==3))
+sdem_1t25 # 412,079
 
 # Total de población
 sdem_1t25 %>% 
   summarise(pob=sum(fac_tri))
 
-# Total de población de 15 anios y más
+# Total de población de 15 anios y más; pág 16
 sdem_1t25 <- 
   sdem_1t25 %>% 
   filter(eda>=15 & eda<=98)
 sdem_1t25 %>% 
   summarise(pop15=sum(fac_tri))
 
+# Población economicamente Activa (PEA)
+sdem_1t25 %>% 
+  filter(clase1==1) %>% 
+  summarise(PEA=sum(fac_tri))
+
 # Población ocupada
-sdem_1t25 <- 
+sdem_1t25_pob_ocup <- 
   sdem_1t25 %>% 
   filter(clase2==1)
-sdem_1t25 %>% 
+sdem_1t25_pob_ocup %>% 
   summarise(pobocup=sum(fac_tri))
 
-# Condicion de la ocupación
-sdem_1t25 %>% 
+# Condición de la ocupación: pág 28
+sdem_1t25_pob_ocup %>% 
+  filter(clase2==1) %>% 
   group_by(emp_ppal) %>% 
-  summarise(pobocup=sum(fac_tri))
+  summarise(pobocup=sum(fac_tri)) %>% 
+  mutate(pct=pobocup/sum(pobocup)*100)
 
 # Seleccionar variables
-sdem_1t25 <- 
-  sdem_1t25 %>% 
+sdem_1t25_pob_ocup <- 
+  sdem_1t25_pob_ocup %>% 
   select(upm,est_d_tri,fac_tri,t_loc_tri,ent,cd_a,sex,
          eda,eda7c,n_hij,seg_soc,rama,ing7c,ingocup,
          hij5c,anios_esc,hrsocup,emp_ppal,medica5c)
 
 # Etiquetas
-sdem_1t25 <- 
-  as_factor(sdem_1t25)
-sdem_1t25
+sdem_1t25_pob_ocup <- 
+  as_factor(sdem_1t25_pob_ocup)
+sdem_1t25_pob_ocup
 
 # Marginación
 marginacion_entidades <- tibble(
@@ -70,21 +78,21 @@ marginacion_entidades <- tibble(
 marginacion_entidades
 
 # Fusión de base y data.frame
-sdem_1t25 <- 
-  sdem_1t25 %>% 
+sdem_1t25_pob_ocup <- 
+  sdem_1t25_pob_ocup %>% 
   inner_join(marginacion_entidades,by="ent")
 
 # Convertir en factor
-sdem_1t25 <- 
-  sdem_1t25 %>% 
+sdem_1t25_pob_ocup <- 
+  sdem_1t25_pob_ocup %>% 
   mutate(indice_marginacion=as.factor(indice_marginacion))
 
 # Filtrar base
 # Escolaridad
-summary(sdem_1t25$anios_esc)
-sdem_1t25 <- 
-  sdem_1t25 %>% 
-  filter(anios_esc<=24)
+summary(sdem_1t25$anios_esc[sdem_1t25$anios_esc<=24])
+sdem_1t25 %>% 
+  filter(clase1==1 & anios_esc<=24) %>% 
+  summarise(escolaridad=weighted.mean(anios_esc,fac_tri))
 
 # Edad
 summary(sdem_1t25$eda)
